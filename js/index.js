@@ -1,0 +1,23 @@
+// 存放不同的页面，点击跳转
+$(function(){
+	$('.nav').on({
+		click:function(){
+			if($(this).text()=='首页'){
+				$('.contentRight').load('page/home.html');
+				return;
+			}
+			if($(this).text()=='栏目管理'){
+				$('.contentRight').load('page/column.html');
+				return;
+			}
+			if($(this).text()=='资讯管理'){
+				$('.contentRight').load('page/informate.html');
+				return;
+			}
+			if($(this).text()=='用户管理'){
+				$('.contentRight').load('page/user.html');
+				return;
+			}
+		}
+	},'p');
+});

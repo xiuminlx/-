@@ -1,0 +1,78 @@
+
+.containers{
+	width: 1005px;
+	margin: 0 auto;
+}
+.box-left{
+	width: 180px;
+	background-color: #282830;
+	float: left;
+}
+.box-left span,.box-left p{
+	color: #fff;
+	font-size: 15px;
+}
+.box-left span{
+	position: absolute;
+	top: 10px;
+}
+.box-left .nav{
+	/*width: 180px;*/
+	padding-top: 30px;
+}
+.box-left img{
+	padding: 7px 17px 0;
+}
+.box-left p{
+	border-bottom: 1px solid #515254;
+	padding: 5px;
+}
+.box-left .nav i{
+	padding: 0 15px;
+}
+.nav .icon-kuozhan{
+	margin-left: 14px;
+}
+.nav p:first-child .icon-kuozhan{
+	margin-left: 45px;
+}
+.box-left .nav a{
+	text-decoration: none;
+	color: #fff;
+	font-size: 16px;
+	/*display: inline-block;*/
+	/*position: absolute;
+	width: 180px;
+	height: 140px;*/
+}
+.box-right{
+	box-sizing: border-box;
+	width: 825px;
+	border: 1px solid #ccc;
+	float: left;
+	background-color: #f0f0f0;
+	position: relative;
+}
+.box-right a{
+	padding-left: 600px; 
+	color: #ccc;
+}
+.box-right .right_top{
+	width: 823px;
+	height: 40px;
+	background-color: #fff;
+}
+.right_top i{
+	padding: 5px 40px;
+	font-size: 20px;
+	line-height: 40px;
+}
+.right_top .touxiang {
+	position: absolute;
+	top: 5px;
+	right: 130px;
+}
+.contentRight{
+	height: 592px;
+	overflow:auto;
+}

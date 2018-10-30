@@ -1,0 +1,234 @@
+<div id="column">
+	<button class="btn btn-success btn-sm addBtn">新 增</button>
+	<button class="btn btn-success btn-sm delBtn">批量删除</button>
+	<!-- 模态框 -->
+	<div class="modal" id="columnModal">
+		<div class="modal-content">
+			<div class="modal-header text-center">
+				<div class="back">
+					<i class="iconfont icon-zuo"></i>
+					<span>返回</span>
+				</div>
+				<div class="title ">添加栏目</div>
+			</div>
+			<div class="modal-body ">
+				<form>
+					<div class="form-group">
+						<label for="">栏目名称</label>
+						<input name="title" type="text" class="form-control">
+					</div>	
+					<div class="form-group">
+						<label for="">父栏目</label>
+						<select name="title1" class="form-control">
+							<option value="">请选择</option>
+						</select>
+					</div>	
+					<div class="form-group">
+						<label for="">描述</label>
+						<textarea name="describe" class="form-control" rows="3"></textarea>
+					</div>
+						<div class="form-group hide">
+							<button type="reset"></button>
+						</div>
+				</form>
+				
+			</div>
+			<div class="modal-footer">
+				<!-- 提示信息 -->
+				<span class="messages"></span>
+				<button class="btn btn-success saveBtn">确 认</button>
+
+			</div>
+		</div>
+	</div>
+	<!-- body中的表格 -->
+	<table class="table table-bordered text-center">
+		<tr>
+			<td>编号</td>
+			<td>栏目名称</td>
+			<td>父栏目</td>
+			<td>描述</td>
+			<td>操作</td>
+		</tr>
+	</table>
+</div>
+<script>
+	$(function(){
+		//所有的栏目
+		var columns = [];
+		var option = '新增';
+		//当前正在修改的对象的id
+		var currentId = '';
+		//设置模态框高度
+		$('.modal-content').height($(window).height());
+		// 给新增按钮绑定事件
+		$('.addBtn').click(function(){
+			option = '新增';
+			//重置表单
+			$('button[type=reset]').trigger('click');
+			//清除提示信息
+			$('.messages').html('');
+			addOption();
+		});
+		// 给返回绑定事件,关闭模态框
+		$('.back').click(function(){
+			$('#columnModal').hide();
+		});
+		//给确认按钮绑定事件
+		$('.saveBtn').click(function(){
+			var title = $('input[name=title]').val();
+			var title1 = $('select[name=title1]').val();
+			var describe = $('textarea[name=describe]').val();
+			if(title&&describe){
+				var obj = {
+					name:title,
+					comment:describe,
+					no:'',
+					parentId:title1
+				};
+				$.post(baseURL+'/manager/category/saveOrUpdateCategory',obj,function(res){
+						console.log(res,'保存或修改成功');
+						alert('保存或修改成功');
+						loadDate();//页面的刷新
+						$('#columnModal').hide();
+				});
+			}else{
+				$('.messages').html('请输入完整的信息');
+			}
+		});
+		//删除(事件代理)
+		$('table').on({
+			click:function(){
+				//获取id，传递给后台
+				var id = $(this).closest('tr').find('input[type=checkbox]').val();
+				var obj = {
+					id:id
+				};
+				$.get(baseURL+'/manager/category/deleteCategoryById',obj,function(res){
+						if(res.status==200){
+							alert('删除成功');
+							loadDate();
+						}else{
+							alert('删除失败');
+							console.log(res.message);
+						}
+				});
+			}
+		},'i[title=删除]');
+		//批量删除
+		$('.delBtn').click(function(){
+			var ids = $('#column input[type=checkbox]:checked').map(function(index,item){
+					return $(item).val();
+			}).get();//jquery转化成数组
+			var obj = {
+				ids:ids.join()
+			};
+			$.post(baseURL+'/manager/category/batchDeleteCategory',obj,function(res){
+					if(res.status==200){
+						alert('批量删除成功');
+						loadDate();
+					}else{
+						alert('批量删除失败');
+						console.log(res.message);
+					}
+			});
+		});
+		//修改
+		$('table').on({
+			click:function(){
+				option = '修改';
+				//清空提示信息
+				$('.messages').html('');
+				//获取id，传递给后台
+				var id = $(this).closest('tr').find('input[type=checkbox]').val();
+				currentId = id;
+				var cat = columns.filter(function(item){
+					return item.id = id;
+				})[0];
+				//设置值
+				$('.input[name=title]').val(cat.name);
+				$('.textarea[name=describe]').val(cat.comment);
+				  addOption(function(){
+				   	$('select[name=title1]').val(cat.parent?cat.parent.id:'');
+				   });
+			}
+		},'i[title=修改]');
+		loadDate();
+		//追加option显示模态框
+		function addOption(handle){
+			$('#column select option:not(:first)').remove();
+			$.get(baseURL+'/manager/category/findAllCategory',function(res){
+				res.data.forEach(function(item){
+					var $option = $('<option value="'+item.id+'">'+item.name+'</option>');
+					$('#column select').append($option);
+				});
+				if(handle){
+					handle();
+				}
+				$('#columnModal').show();
+
+			});
+		}
+		//获取数据
+		function loadDate(){
+			//删除节点
+			$('table tr:not(:first)').remove();
+			$.get(baseURL+'/manager/category/findAllCategory',function(res){
+				columns = res.data;
+				res.data.forEach(function(item){
+					// 创建行，追加
+					var $tr = $(`<tr>
+			<td><input type="checkbox" value="`+item.id+`"></td>
+			<td>`+item.name+`</td>
+			<td>`+(item.parent?item.parent.name:'-')+`</td>
+			<td>`+item.comment+`</td>
+			<td>
+				<i class="iconfont icon-edit-1-copy" title="修改"></i>
+				<i class="iconfont icon-shanchu" title="删除"></i>
+			</td>
+		</tr>`);
+					$('#column table').append($tr);
+				});
+			});
+		}
+	});
+</script>
+<style>
+	#column{
+		width: 98%;
+		margin: 10px auto;
+		background-color: #fff;
+		padding: 10px;
+	}
+	.modal{
+		background-color: rgba(0,0,0,0.4);
+
+	}
+	.modal-content{
+		width: 350px;
+		position: absolute;
+		top: 0;
+		right: 0;
+	}
+	.back{
+		float: left;
+		cursor: pointer;
+	}
+	table{
+		margin-top: 10px;
+	}
+	table input{
+		left-left: 100px;
+	}
+	table i{
+		color: #66bb0d;
+		cursor: pointer;
+	}
+	table i:last-child{
+		color: red;
+		padding-left: 10px;
+	}
+	.messages{
+		color: red;
+	}
+</style>
